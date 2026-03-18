@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Delete Event')}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-5 mb-5">
+    <h1 class="mb-3">Delete Event</h1>
+    <p class="fs-5 mb-4">Are you sure you want to delete the following event?</p>
+
+    <div class="mb-5">
+        <h5 class="fw-bold mb-1">Name</h5>
+        <p class="mb-3" th:text="${event.name}">Event Name</p>
+
+        <h5 class="fw-bold mb-1">Date</h5>
+        <p class="mb-3" th:text="${#temporals.format(event.date, 'dd MMM yyyy')}">Date</p>
+
+        <h5 class="fw-bold mb-1">Type</h5>
+        <p class="mb-3" th:text="${event.type}">TYPE</p>
+
+        <h5 class="fw-bold mb-1">Location</h5>
+        <p class="mb-3" th:text="${event.location ?: 'N/A'}">Location</p>
+
+        <h5 class="fw-bold mb-1">Club</h5>
+        <p class="mb-4" th:text="${club.name}">Club Name</p>
+    </div>
+
+    <form th:action="@{/clubs/{clubId}/events/{eventId}(clubId=${club.id}, eventId=${event.id})}" method="post">
+        <input type="hidden" name="_method" value="DELETE"/>
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+
+        <a th:href="@{/clubs/{clubId}/events/{eventId}(clubId=${club.id}, eventId=${event.id})}" class="btn btn-link text-secondary text-decoration-none ms-3">Cancel</a>
+    </form>
+</div>
+
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

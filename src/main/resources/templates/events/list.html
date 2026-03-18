@@ -75,8 +75,8 @@
 
             <td>
                 <div class="d-flex gap-2">
-                    <a th:href="@{/events/{id}/edit(id=${event.id})}" class="btn btn-outline-primary btn-sm">Edit</a>
-                    <a th:href="@{/events/{id}/delete(id=${event.id})}" class="btn btn-outline-danger btn-sm">Delete</a>
+                    <a th:href="@{/clubs/{clubId}/events/{eventId}/edit(clubId=${event.clubId}, eventId=${event.id})}" class="btn btn-outline-primary btn-sm">Edit</a>
+                    <a th:href="@{/clubs/{clubId}/events/{eventId}/delete(clubId=${event.clubId}, eventId=${event.id})}" class="btn btn-outline-danger btn-sm">Delete</a>
                 </div>
             </td>
         </tr>

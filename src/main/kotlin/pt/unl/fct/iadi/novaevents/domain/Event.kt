@@ -7,13 +7,10 @@ import java.time.LocalDate
 data class Event(
     val id: Long,
     val clubId: Long,
-    @NotBlank(message = "Name is required")
     val name: String,
-    @NotNull("Date is required")
     val date: LocalDate,
-    val location: String,
-    @NotNull("Event type is required")
+    val location: String?,
     val type: EventType,
-    val description: String
+    val description: String?
 ) {
 }

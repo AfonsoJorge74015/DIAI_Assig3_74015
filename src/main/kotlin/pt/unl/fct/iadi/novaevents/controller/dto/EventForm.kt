@@ -1,0 +1,20 @@
+package pt.unl.fct.iadi.novaevents.controller.dto
+
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import org.springframework.format.annotation.DateTimeFormat
+import pt.unl.fct.iadi.novaevents.domain.EventType
+import java.time.LocalDate
+
+data class EventForm(
+    @field:NotBlank(message = "Name cannot be blank")
+    val name: String? = null,
+    @field:NotNull(message = "Date cannot be blank")
+    @field:DateTimeFormat(pattern = "yyyy-MM-dd")
+    val date: LocalDate? = null,
+    @field:NotNull(message = "Event type required")
+    val type: EventType? = null,
+    val location: String? = null,
+    val description: String? = null
+) {
+}

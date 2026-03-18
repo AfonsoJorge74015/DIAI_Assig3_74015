@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Page Not Found')}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-5 mb-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h1 class="display-1 fw-bold text-muted mb-4">404</h1>
+
+            <h2 class="mb-3">Oops! We couldn't find that page.</h2>
+            <p class="lead text-danger mb-5" th:if="${errorMessage}" th:text="${errorMessage}">
+                Specific error message goes here.
+            </p>
+
+            <p class="lead text-muted mb-5" th:unless="${errorMessage}">
+                The club, event, or page you are looking for doesn't exist or might have been moved.
+            </p>
+
+            <a th:href="@{/clubs}" class="btn btn-primary btn-lg">
+                Return to Clubs List
+            </a>
+        </div>
+    </div>
+</div>
+
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>
