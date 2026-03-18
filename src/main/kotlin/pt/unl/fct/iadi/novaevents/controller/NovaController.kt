@@ -47,7 +47,7 @@ class NovaController(
 
     override fun submitFormNew(clubId: Long, event: EventForm, bindingResult: BindingResult, model: ModelMap): String {
         if (service.getFilteredEvents(null, null).any { it.name == event.name }) {
-            bindingResult.rejectValue("name", "duplicate", "Name is already taken")
+            bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
         if(bindingResult.hasErrors()) {
             model["club"] = service.getClub(clubId)
@@ -79,7 +79,7 @@ class NovaController(
         model: ModelMap
     ): String {
         if (service.getFilteredEvents(null, null).any { it.name == event.name && it.id != eventId }) {
-            bindingResult.rejectValue("name", "duplicate", "Name is already taken")
+            bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
         if(bindingResult.hasErrors()) {
             model["club"] = service.getClub(clubId)
@@ -98,6 +98,6 @@ class NovaController(
 
     override fun deleteEvent(clubId: Long, eventId: Long, model: ModelMap): String {
         service.deleteEvent(eventId)
-        return "redirect:/clubs"
+        return "redirect:/clubs/${clubId}"
     }
 }
