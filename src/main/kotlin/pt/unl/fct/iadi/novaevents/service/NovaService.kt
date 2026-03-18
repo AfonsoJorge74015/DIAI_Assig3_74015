@@ -25,7 +25,12 @@ class NovaService(
             Club(5, "Film Society", "", ClubCategory.CULTURAL)
         )
 
-    private val events = mutableListOf<Event>()
+    private val events = mutableListOf<Event>(
+        Event(1, 1, "Beginner's Chess Workshop", java.time.LocalDate.of(2026, 3, 10),
+            "Room A101", EventType.WORKSHOP, "Learn chess basics."),
+        Event(2, 1, "Spring Chess Tournament", java.time.LocalDate.of(2026, 5, 15),
+            "Main Hall", EventType.COMPETITION, "Annual tournament.")
+    )
 
     fun getAllClubs(): List<ClubDTO> {
         return clubs.map { mappers.clubToDTO(it)}

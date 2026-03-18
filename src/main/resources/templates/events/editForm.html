@@ -18,6 +18,7 @@
             <h2 class="card-title mb-4">Edit Event</h2>
 
             <form th:action="@{/clubs/{clubId}/events/{eventId}(clubId=${club.id}, eventId=${event.id})}" th:object="${eventForm}" method="post">
+                <input type="hidden" name="_method" value="PUT"/>
 
                 <div class="mb-3">
                     <label for="name" class="form-label fw-bold">Event Name *</label>

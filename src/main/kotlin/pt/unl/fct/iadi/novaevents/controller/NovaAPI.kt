@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestParam
 import pt.unl.fct.iadi.novaevents.domain.EventType
 import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
@@ -45,7 +46,7 @@ interface NovaAPI {
     @GetMapping("/clubs/{clubId}/events/{eventId}/edit")
     fun editForm(@PathVariable clubId: Long, @PathVariable eventId: Long, model: ModelMap): String
 
-    @PostMapping("/clubs/{clubId}/events/{eventId}")
+    @PutMapping("/clubs/{clubId}/events/{eventId}")
     fun submitFormEdit(
         @PathVariable clubId: Long,
         @PathVariable eventId: Long,

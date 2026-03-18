@@ -46,6 +46,9 @@ class NovaController(
     }
 
     override fun submitFormNew(clubId: Long, event: EventForm, bindingResult: BindingResult, model: ModelMap): String {
+        if (service.getFilteredEvents(null, null).any { it.name == event.name }) {
+            bindingResult.rejectValue("name", "duplicate", "Name is already taken")
+        }
         if(bindingResult.hasErrors()) {
             model["club"] = service.getClub(clubId)
             return "events/form"
@@ -75,6 +78,9 @@ class NovaController(
         bindingResult: BindingResult,
         model: ModelMap
     ): String {
+        if (service.getFilteredEvents(null, null).any { it.name == event.name && it.id != eventId }) {
+            bindingResult.rejectValue("name", "duplicate", "Name is already taken")
+        }
         if(bindingResult.hasErrors()) {
             model["club"] = service.getClub(clubId)
             model["event"] = service.getEvent(eventId)
