@@ -16,7 +16,7 @@
         <p class="mb-3" th:text="${#temporals.format(event.date, 'dd MMM yyyy')}">Date</p>
 
         <h5 class="fw-bold mb-1">Type</h5>
-        <p class="mb-3" th:text="${event.type}">TYPE</p>
+        <p class="mb-3" th:text="${event.type.name}">TYPE</p>
 
         <h5 class="fw-bold mb-1">Location</h5>
         <p class="mb-3" th:text="${event.location ?: 'N/A'}">Location</p>

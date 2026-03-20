@@ -68,7 +68,7 @@
             <td th:text="${#temporals.format(event.date, 'dd MMM yyyy')}">Date</td>
 
             <td>
-                <span class="badge bg-secondary text-uppercase" th:text="${event.type}">TYPE</span>
+                <span class="badge bg-secondary text-uppercase" th:text="${event.type.name}">TYPE</span>
             </td>
 
             <td th:text="${event.location}">Location</td>

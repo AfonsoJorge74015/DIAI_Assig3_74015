@@ -12,6 +12,7 @@ class Mappers {
 
     fun toEventResponse(event: Event): EventResponse {
         return EventResponse(
+            id = event.id!!,
             clubId = event.clubId!!,
             name = event.name!!,
             date = event.date!!,

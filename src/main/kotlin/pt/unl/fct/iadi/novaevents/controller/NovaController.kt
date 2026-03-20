@@ -8,6 +8,7 @@ import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
 import pt.unl.fct.iadi.novaevents.model.Club
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
+import pt.unl.fct.iadi.novaevents.service.EventTypeService
 import pt.unl.fct.iadi.novaevents.utils.Mappers
 import kotlin.collections.set
 
@@ -15,6 +16,7 @@ import kotlin.collections.set
 class NovaController(
     private val clubService: ClubService,
     private val eventService: EventService,
+    private val eventTypeService: EventTypeService,
     private val mappers: Mappers
 ) : NovaAPI {
 
@@ -39,6 +41,7 @@ class NovaController(
         val clubs = clubService.getAllClubs()
         model["events"] = events.map { mappers.toEventResponse(it) }
         model["clubs"] = clubs.map { mappers.toClubResponse(it) }
+        model["eventTypes"] = eventTypeService.allEventTypes().map { it.name }
         return "events/list"
     }
 
@@ -54,6 +57,7 @@ class NovaController(
         val club = clubService.getClub(clubId)
         model["club"] = mappers.toClubResponse(club)
         model["eventForm"] = EventFormRequest()
+        model["eventTypes"] = eventTypeService.allEventTypes()
         return "events/form"
     }
 
@@ -64,6 +68,7 @@ class NovaController(
         if(bindingResult.hasErrors()) {
             val club = clubService.getClub(clubId)
             model["club"] = mappers.toClubResponse(club)
+            model["eventTypes"] = eventTypeService.allEventTypes()
             return "events/form"
         }
         val newEvent = eventService.createEvent(clubId, event)
@@ -77,6 +82,7 @@ class NovaController(
 
         model["club"] = mappers.toClubResponse(club)
         model["event"] = eventDto
+        model["eventTypes"] = eventTypeService.allEventTypes()
         model["eventForm"] = EventFormRequest(
             name = eventDto.name,
             date = eventDto.date,
@@ -102,6 +108,7 @@ class NovaController(
             val event = eventService.getEvent(eventId)
             model["club"] = mappers.toClubResponse(club)
             model["event"] = mappers.toEventResponse(event)
+            model["eventTypes"] = eventTypeService.allEventTypes()
             return "events/editForm"
         }
         eventService.updateEvent(eventId, clubId, event)

@@ -35,7 +35,7 @@
                     <label for="type" class="form-label fw-bold">Event Type *</label>
                     <select id="type" th:field="*{type}" class="form-select" th:classappend="${#fields.hasErrors('type')} ? 'is-invalid' : ''">
                         <option value="">Select a type...</option>
-                        <option th:each="t : ${eventTypes}" th:value="${t}" th:text="${t}"></option>
+                        <option th:each="t : ${eventTypes}" th:value="${t.id}" th:text="${t.name}"></option>
                     </select>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}">Type error</div>
                 </div>
