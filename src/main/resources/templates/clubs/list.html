@@ -13,6 +13,7 @@
             <th>Name</th>
             <th>Category</th>
             <th>Description</th>
+            <th>Events</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -28,6 +29,11 @@
                     <span class="text-muted small" th:text="${club.description}">Full description</span>
                 </details>
             </td>
+
+            <td>
+                <span class="badge bg-info text-dark" th:text="${club.eventCount} + ' Events'">3 Events</span>
+            </td>
+
             <td>
                 <a th:href="@{/clubs/{id}(id=${club.id})}" class="btn btn-outline-primary btn-sm">View Details</a>
             </td>

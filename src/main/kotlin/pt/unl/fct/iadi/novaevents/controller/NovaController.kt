@@ -3,70 +3,86 @@ package pt.unl.fct.iadi.novaevents.controller
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.ExceptionHandler
-import pt.unl.fct.iadi.novaevents.domain.EventType
-import pt.unl.fct.iadi.novaevents.service.NovaService
-import pt.unl.fct.iadi.novaevents.controller.dto.EventForm
+import pt.unl.fct.iadi.novaevents.model.EventType
+import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
+import pt.unl.fct.iadi.novaevents.model.Club
+import pt.unl.fct.iadi.novaevents.service.ClubService
+import pt.unl.fct.iadi.novaevents.service.EventService
+import pt.unl.fct.iadi.novaevents.utils.Mappers
 import kotlin.collections.set
 
 @Controller
 class NovaController(
-    private val service: NovaService) : NovaAPI {
+    private val clubService: ClubService,
+    private val eventService: EventService,
+    private val mappers: Mappers
+) : NovaAPI {
 
     override fun home(): String {
         return "redirect:/clubs"
     }
 
     override fun listClubs(model: ModelMap): String {
-        model["clubs"] = service.getAllClubs()
+        val clubs = clubService.getAllClubsWithEventCount()
+        model["clubs"] = clubs
         return "clubs/list"
     }
 
     override fun clubDetails(clubId: Long, model: ModelMap): String {
-        model["club"] = service.getClub(clubId)
+        val club = clubService.getClub(clubId)
+        model["club"] = mappers.toClubResponse(club)
         return "clubs/detail"
     }
 
     override fun listEvents(type: EventType?, clubId: Long?, model: ModelMap): String {
-        model["events"] = service.getFilteredEvents(type, clubId)
-        model["clubs"] = service.getAllClubs()
+        val events = eventService.getFilteredEvents(type, clubId)
+        val clubs = clubService.getAllClubs()
+        model["events"] = events.map { mappers.toEventResponse(it) }
+        model["clubs"] = clubs.map { mappers.toClubResponse(it) }
         return "events/list"
     }
 
     override fun eventDetails(clubId: Long, eventId: Long, model: ModelMap): String {
-        model["club"] = service.getClub(clubId)
-        model["event"] = service.getEvent(eventId)
+        val club = clubService.getClub(clubId)
+        val event = eventService.getEvent(eventId)
+        model["club"] = mappers.toClubResponse(club)
+        model["event"] = mappers.toEventResponse(event)
         return "events/detail"
     }
 
     override fun showForm(clubId: Long, model: ModelMap): String {
-        model["club"] = service.getClub(clubId)
-        model["eventForm"] = EventForm()
+        val club = clubService.getClub(clubId)
+        model["club"] = mappers.toClubResponse(club)
+        model["eventForm"] = EventFormRequest()
         return "events/form"
     }
 
-    override fun submitFormNew(clubId: Long, event: EventForm, bindingResult: BindingResult, model: ModelMap): String {
-        if (service.getFilteredEvents(null, null).any { it.name == event.name }) {
+    override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
+        if (eventService.getEventByName(event.name!!)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
         if(bindingResult.hasErrors()) {
-            model["club"] = service.getClub(clubId)
+            val club = clubService.getClub(clubId)
+            model["club"] = mappers.toClubResponse(club)
             return "events/form"
         }
-        val newEvent = service.createEvent(clubId, event)
+        val newEvent = eventService.createEvent(clubId, event)
         return "redirect:/clubs/${clubId}/events/${newEvent.id}"
     }
 
     override fun editForm(clubId: Long, eventId: Long, model: ModelMap): String {
-        val currentEvent = service.getEvent(eventId)
-        model["club"] = service.getClub(clubId)
-        model["event"] = currentEvent
-        model["eventForm"] = EventForm(
-            name = currentEvent.name,
-            date = currentEvent.date,
-            type = currentEvent.type,
-            location = currentEvent.location,
-            description = currentEvent.description
+        val currentEvent = eventService.getEvent(eventId)
+        val eventDto = mappers.toEventResponse(currentEvent)
+        val club = clubService.getClub(clubId)
+
+        model["club"] = mappers.toClubResponse(club)
+        model["event"] = eventDto
+        model["eventForm"] = EventFormRequest(
+            name = eventDto.name,
+            date = eventDto.date,
+            type = eventDto.type,
+            location = eventDto.location,
+            description = eventDto.description
         )
         return "events/editForm"
     }
@@ -74,30 +90,34 @@ class NovaController(
     override fun submitFormEdit(
         clubId: Long,
         eventId: Long,
-        event: EventForm,
+        event: EventFormRequest,
         bindingResult: BindingResult,
         model: ModelMap
     ): String {
-        if (service.getFilteredEvents(null, null).any { it.name == event.name && it.id != eventId }) {
+        if (eventService.getEventByNameExcludingId(event.name!!, eventId)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
         if(bindingResult.hasErrors()) {
-            model["club"] = service.getClub(clubId)
-            model["event"] = service.getEvent(eventId)
+            val club = clubService.getClub(clubId)
+            val event = eventService.getEvent(eventId)
+            model["club"] = mappers.toClubResponse(club)
+            model["event"] = mappers.toEventResponse(event)
             return "events/editForm"
         }
-        val updatedEvent = service.updateEvent(eventId, clubId, event)
-        return "redirect:/clubs/${clubId}/events/${updatedEvent.id}"
+        eventService.updateEvent(eventId, clubId, event)
+        return "redirect:/clubs/${clubId}/events/${eventId}"
     }
 
     override fun deleteConfirm(clubId: Long, eventId: Long, model: ModelMap): String {
-        model["club"] = service.getClub(clubId)
-        model["event"] = service.getEvent(eventId)
+        val club = clubService.getClub(clubId)
+        val event = eventService.getEvent(eventId)
+        model["club"] = mappers.toClubResponse(club)
+        model["event"] = mappers.toEventResponse(event)
         return "events/delete"
     }
 
     override fun deleteEvent(clubId: Long, eventId: Long, model: ModelMap): String {
-        service.deleteEvent(eventId)
+        eventService.deleteEvent(eventId)
         return "redirect:/clubs/${clubId}"
     }
 }
