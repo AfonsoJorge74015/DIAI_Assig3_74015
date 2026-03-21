@@ -17,9 +17,9 @@
                     <select id="type" name="type" class="form-select">
                         <option value="">All types</option>
                         <option th:each="t : ${eventTypes}"
-                                th:value="${t.id}"
+                                th:value="${t.name}"
                                 th:text="${t.name}"
-                                th:selected="${param.type != null and param.type[0] == t.id.toString()}">
+                                th:selected="${param.type != null and param.type[0] == t.name}">
                         </option>
                     </select>
                 </div>

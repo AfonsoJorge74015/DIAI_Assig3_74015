@@ -38,7 +38,7 @@ class NovaController(
         return "clubs/detail"
     }
 
-    override fun listEvents(type: EventType?, clubId: Long?, model: ModelMap): String {
+    override fun listEvents(type: String?, clubId: Long?, model: ModelMap): String {
         val events = eventService.getFilteredEvents(type, clubId)
         val clubs = clubService.getAllClubs()
         model["events"] = events.map { mappers.toEventResponse(it) }
@@ -64,7 +64,7 @@ class NovaController(
     }
 
     override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
-        if (eventService.getEventByName(event.name!!)) {
+        if (event.name != null && eventService.getEventByName(event.name)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
         if(bindingResult.hasErrors()) {

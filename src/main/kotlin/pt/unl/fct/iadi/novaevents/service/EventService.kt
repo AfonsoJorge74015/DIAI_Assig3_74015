@@ -14,8 +14,11 @@ class EventService(
     private val eventTypeRepository: EventTypeRepository
 ) {
 
-    fun getFilteredEvents(type: EventType?, clubId: Long?): List<Event> {
-        return eventRepository.findByTypeAndClubId(type, clubId)
+    fun getFilteredEvents(type: String?, clubId: Long?): List<Event> {
+        val eventType = if(type != null)
+            eventTypeRepository.findByName(type)
+        else null
+        return eventRepository.findByTypeAndClubId(eventType, clubId)
     }
 
     fun getEvent(eventId: Long): Event {

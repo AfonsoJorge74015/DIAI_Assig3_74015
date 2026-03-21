@@ -26,7 +26,7 @@ interface NovaAPI {
     fun clubDetails(@PathVariable clubId: Long, model: ModelMap): String
 
     @GetMapping("/events")
-    fun listEvents(@RequestParam(required = false) type: EventType?,
+    fun listEvents(@RequestParam(required = false) type: String?,
                    @RequestParam(required = false) clubId: Long?,
                    model: ModelMap): String
 
