@@ -1,8 +1,11 @@
 package pt.unl.fct.iadi.novaevents.controller
 
+import jakarta.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import pt.unl.fct.iadi.novaevents.model.EventType
 import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
 import pt.unl.fct.iadi.novaevents.model.Club
@@ -61,16 +64,27 @@ class NovaController(
         return "events/form"
     }
 
-    override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
+    override fun submitFormNew(
+        clubId: Long,
+        @Valid @ModelAttribute("eventForm") event: EventFormRequest,
+        bindingResult: BindingResult,
+        model: ModelMap,
+        redirectAttributes: RedirectAttributes // <-- Add this
+    ): String {
+
         if (eventService.getEventByName(event.name!!)) {
-            bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
+            // Trigger a redirect for the duplicate name error
+            redirectAttributes.addFlashAttribute("errorMessage", "An event with this name already exists")
+            return "redirect:/clubs/${clubId}/events/new"
         }
+
         if(bindingResult.hasErrors()) {
             val club = clubService.getClub(clubId)
             model["club"] = mappers.toClubResponse(club)
             model["eventTypes"] = eventTypeService.allEventTypes()
-            return "redirect:events/form"
+            return "events/form"
         }
+
         val newEvent = eventService.createEvent(clubId, event)
         return "redirect:/clubs/${clubId}/events/${newEvent.id}"
     }
@@ -109,7 +123,7 @@ class NovaController(
             model["club"] = mappers.toClubResponse(club)
             model["event"] = mappers.toEventResponse(event)
             model["eventTypes"] = eventTypeService.allEventTypes()
-            return "redirect:events/editForm"
+            return "events/editForm"
         }
         eventService.updateEvent(eventId, clubId, event)
         return "redirect:/clubs/${clubId}/events/${eventId}"
