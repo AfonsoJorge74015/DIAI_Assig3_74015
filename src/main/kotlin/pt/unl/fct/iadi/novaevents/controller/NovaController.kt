@@ -72,7 +72,7 @@ class NovaController(
             return "events/form"
         }
         val newEvent = eventService.createEvent(clubId, event)
-        return "redirect:/clubs/${clubId}"
+        return "redirect:/clubs/${clubId}/events/${newEvent.id}"
     }
 
     override fun editForm(clubId: Long, eventId: Long, model: ModelMap): String {
@@ -120,7 +120,7 @@ class NovaController(
         val event = eventService.getEvent(eventId)
         model["club"] = mappers.toClubResponse(club)
         model["event"] = mappers.toEventResponse(event)
-        return "events/delete"
+        return "redirect:/clubs/${clubId}/events/${eventId}"
     }
 
     override fun deleteEvent(clubId: Long, eventId: Long, model: ModelMap): String {
