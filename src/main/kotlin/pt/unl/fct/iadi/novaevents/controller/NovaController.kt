@@ -41,7 +41,7 @@ class NovaController(
         val clubs = clubService.getAllClubs()
         model["events"] = events.map { mappers.toEventResponse(it) }
         model["clubs"] = clubs.map { mappers.toClubResponse(it) }
-        model["eventTypes"] = eventTypeService.allEventTypes().map { it.name }
+        model["eventTypes"] = eventTypeService.allEventTypes()
         return "events/list"
     }
 
@@ -109,7 +109,7 @@ class NovaController(
             model["club"] = mappers.toClubResponse(club)
             model["event"] = mappers.toEventResponse(event)
             model["eventTypes"] = eventTypeService.allEventTypes()
-            return "events/editForm"
+            return "redirect:/clubs/${clubId}/events/edit"
         }
         eventService.updateEvent(eventId, clubId, event)
         return "redirect:/clubs/${clubId}/events/${eventId}"
