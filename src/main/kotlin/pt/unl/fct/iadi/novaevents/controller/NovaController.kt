@@ -69,20 +69,26 @@ class NovaController(
         @Valid @ModelAttribute("eventForm") event: EventFormRequest,
         bindingResult: BindingResult,
         model: ModelMap,
-        redirectAttributes: RedirectAttributes // <-- Add this
+        redirectAttributes: RedirectAttributes
     ): String {
 
         if (eventService.getEventByName(event.name!!)) {
-            // Trigger a redirect for the duplicate name error
             redirectAttributes.addFlashAttribute("errorMessage", "An event with this name already exists")
             return "redirect:/clubs/${clubId}/events/new"
         }
 
-        if(bindingResult.hasErrors()) {
-            val club = clubService.getClub(clubId)
-            model["club"] = mappers.toClubResponse(club)
-            model["eventTypes"] = eventTypeService.allEventTypes()
-            return "events/form"
+        if (bindingResult.hasErrors()) {
+            // 1. Pass the user's input back to the form so it doesn't clear their text
+            redirectAttributes.addFlashAttribute("eventForm", event)
+
+            // 2. Pass the BindingResult so Thymeleaf can still see the field errors
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.eventForm",
+                bindingResult
+            )
+
+            // 3. Now it is safe to redirect
+            return "redirect:/clubs/${clubId}/events/new"
         }
 
         val newEvent = eventService.createEvent(clubId, event)
