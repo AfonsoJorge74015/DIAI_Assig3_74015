@@ -12,6 +12,7 @@ interface EventRepository : JpaRepository<Event, Long> {
     fun existsByNameAndIdNot(name: String, id: Long) : Boolean;
     @Query("""
         SELECT e FROM Event e 
+        LEFT JOIN FETCH e.type
         WHERE (:type IS NULL OR e.type = :type) 
         AND (:clubId IS NULL OR e.clubId = :clubId)
     """)

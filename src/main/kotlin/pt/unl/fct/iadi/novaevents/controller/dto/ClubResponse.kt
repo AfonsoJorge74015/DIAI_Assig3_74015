@@ -7,6 +7,6 @@ data class ClubResponse(
     val name: String,
     val description: String,
     val category: ClubCategory,
-    val nEvents: Long = 0L
+    val eventCount: Long = 0L
 ) {
 }
