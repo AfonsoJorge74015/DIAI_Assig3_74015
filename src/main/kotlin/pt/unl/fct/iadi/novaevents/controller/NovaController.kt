@@ -63,9 +63,7 @@ class NovaController(
         return "events/form"
     }
 
-    override fun submitFormNew(clubId: Long,
-                               @Valid @ModelAttribute("eventForm") event: EventFormRequest,
-                               bindingResult: BindingResult, model: ModelMap): String {
+    override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
         if (eventService.getEventByName(event.name!!)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }

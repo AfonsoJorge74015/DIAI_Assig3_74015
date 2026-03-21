@@ -9,7 +9,7 @@ data class EventResponse(
     val name: String,
     val date: LocalDate,
     val location: String?,
-    val type: EventType,
+    val type: String,
     val description: String?
 ) {
 }

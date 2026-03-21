@@ -13,19 +13,9 @@ data class EventFormRequest(
     @field:NotNull(message = "Date is required")
     @field:DateTimeFormat(pattern = "yyyy-MM-dd")
     val date: LocalDate? = null,
-    @field:NotNull(message = "Event type is required")
-    val type: EventType? = null,
+    @field:NotBlank(message = "Event type is required")
+    val type: String? = null,
     val location: String? = null,
     val description: String? = null
 ) {
-
-    fun toEvent(): Event {
-        return Event().apply {
-            this.name = this@EventFormRequest.name
-            this.date = this@EventFormRequest.date
-            this.type = this@EventFormRequest.type
-            this.location = this@EventFormRequest.location
-            this.description = this@EventFormRequest.description
-        }
-    }
 }

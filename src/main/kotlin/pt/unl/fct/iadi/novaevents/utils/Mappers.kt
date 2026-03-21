@@ -17,7 +17,7 @@ class Mappers {
             name = event.name!!,
             date = event.date!!,
             location = event.location,
-            type = event.type!!,
+            type = event.type!!.name!!,
             description = event.description
         )
     }

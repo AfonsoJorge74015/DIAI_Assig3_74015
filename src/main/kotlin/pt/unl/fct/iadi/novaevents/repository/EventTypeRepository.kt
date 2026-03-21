@@ -6,4 +6,5 @@ import pt.unl.fct.iadi.novaevents.model.EventType
 
 @Repository
 interface EventTypeRepository: JpaRepository<EventType, Long> {
+    fun findByName(name: String): EventType?
 }

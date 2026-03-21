@@ -6,27 +6,29 @@ import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
 import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.model.EventType
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
+import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
 
 @Service
 class EventService(
-    private val repository: EventRepository
+    private val eventRepository: EventRepository,
+    private val eventTypeRepository: EventTypeRepository
 ) {
 
     fun getFilteredEvents(type: EventType?, clubId: Long?): List<Event> {
-        return repository.findByTypeAndClubId(type, clubId)
+        return eventRepository.findByTypeAndClubId(type, clubId)
     }
 
     fun getEvent(eventId: Long): Event {
-        return repository.findById(eventId)
+        return eventRepository.findById(eventId)
             .orElseThrow { NoSuchElementException("No event found with id $eventId") }
     }
 
     fun getEventByName(eventName: String): Boolean {
-        return repository.existsByName(eventName)
+        return eventRepository.existsByName(eventName)
     }
 
     fun getEventByNameExcludingId(eventName: String, eventId: Long): Boolean {
-        return repository.existsByNameAndIdNot(eventName, eventId)
+        return eventRepository.existsByNameAndIdNot(eventName, eventId)
     }
 
     @Transactional
@@ -36,29 +38,29 @@ class EventService(
             this.name = form.name
             this.date = form.date
             this.location = form.location
-            this.type = form.type
+            this.type = eventTypeRepository.findByName(form.type!!)
             this.description = form.description
         }
 
-        return repository.save(event)
+        return eventRepository.save(event)
     }
 
     @Transactional
     fun updateEvent(eventId: Long, clubId: Long, form: EventFormRequest) {
-        val event = repository.findById(eventId)
+        val event = eventRepository.findById(eventId)
             .orElseThrow { NoSuchElementException("No event found with id $eventId") }
 
         event.clubId = clubId
         event.name = form.name
         event.date = form.date
         event.location = form.location
-        event.type = form.type
+        event.type = eventTypeRepository.findByName(form.type!!)
         event.description = form.description
 
-        repository.save(event)
+        eventRepository.save(event)
     }
 
     fun deleteEvent(eventId: Long) {
-        repository.deleteById(eventId)
+        eventRepository.deleteById(eventId)
     }
 }
