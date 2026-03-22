@@ -30,9 +30,7 @@
                 </details>
             </td>
 
-            <td>
-                <span class="badge bg-primary" th:text="${club.events}">Events</span>
-            </td>
+            <td class="events" th:text="${club.events}">Events</td>
 
             <td>
                 <a th:href="@{/clubs/{id}(id=${club.id})}" class="btn btn-outline-primary btn-sm">View Details</a>

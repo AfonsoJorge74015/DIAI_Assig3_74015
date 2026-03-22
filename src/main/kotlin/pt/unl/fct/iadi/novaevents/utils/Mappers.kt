@@ -1,6 +1,5 @@
 package pt.unl.fct.iadi.novaevents.utils
 
-import org.hibernate.annotations.Comment
 import org.springframework.stereotype.Component
 import pt.unl.fct.iadi.novaevents.controller.dto.ClubResponse
 import pt.unl.fct.iadi.novaevents.controller.dto.EventResponse

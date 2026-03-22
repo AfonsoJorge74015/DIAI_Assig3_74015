@@ -1,13 +1,9 @@
 package pt.unl.fct.iadi.novaevents.controller
 
-import jakarta.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.ModelAttribute
-import pt.unl.fct.iadi.novaevents.model.EventType
 import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
-import pt.unl.fct.iadi.novaevents.model.Club
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import pt.unl.fct.iadi.novaevents.service.EventTypeService
