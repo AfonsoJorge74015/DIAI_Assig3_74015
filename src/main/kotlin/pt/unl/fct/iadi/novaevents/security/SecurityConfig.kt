@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 
@@ -82,7 +83,9 @@ class SecurityConfig(
         }
 
         http.exceptionHandling { exceptions ->
-            exceptions.authenticationEntryPoint { request, response, _ ->
+            val loginEntryPoint = LoginUrlAuthenticationEntryPoint("/login")
+
+            exceptions.authenticationEntryPoint { request, response, authException ->
                 val requestUri = request.requestURI
                 val queryString = request.queryString
                 val targetUrl = if (queryString != null) "$requestUri?$queryString" else requestUri
@@ -93,7 +96,8 @@ class SecurityConfig(
                     isHttpOnly = true
                 }
                 response.addCookie(redirectCookie)
-                response.sendRedirect("/login")
+
+                loginEntryPoint.commence(request, response, authException)
             }
         }
 
