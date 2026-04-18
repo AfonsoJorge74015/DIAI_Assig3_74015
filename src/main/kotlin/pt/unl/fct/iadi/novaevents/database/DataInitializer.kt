@@ -2,21 +2,27 @@ package pt.unl.fct.iadi.novaevents.database
 
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import pt.unl.fct.iadi.novaevents.model.Club
 import pt.unl.fct.iadi.novaevents.model.ClubCategory
 import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.model.EventType
+import pt.unl.fct.iadi.novaevents.model.Role
+import pt.unl.fct.iadi.novaevents.model.User
 import pt.unl.fct.iadi.novaevents.repository.ClubRepository
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
+import pt.unl.fct.iadi.novaevents.repository.UserRepository
 import java.time.LocalDate
 
 @Component
 class DataInitializer(
     private val eventTypeRepository: EventTypeRepository,
     private val clubRepository: ClubRepository,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
@@ -88,6 +94,26 @@ class DataInitializer(
         )
 
         eventRepository.saveAll(initialEvents)
+
+        val users = listOf(
+            Pair("alice", "ROLE_EDITOR"),
+            Pair("bob", "ROLE_EDITOR"),
+            Pair("charlie", "ROLE_ADMIN")
+        )
+
+        users.forEach { (username, roleName) ->
+            if (userRepository.findByUsername(username) == null) {
+                val user = User().apply {
+                    this.username = username
+                    this.password = passwordEncoder.encode("password123")
+                }
+                user.roles.add(Role().apply {
+                    this.name = roleName
+                    this.user = user
+                })
+                userRepository.save(user)
+            }
+        }
 
         println("Database seeded successfully with Types, Clubs, and Events!")
     }

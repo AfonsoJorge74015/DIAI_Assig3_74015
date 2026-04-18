@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <title th:text="${title} + ' - Nova Events'">Nova Events</title>
@@ -16,7 +17,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/clubs}">Clubs</a>
                 </li>
@@ -24,6 +25,22 @@
                     <a class="nav-link" th:href="@{/events}">Events</a>
                 </li>
             </ul>
+
+            <div class="d-flex">
+
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
+                    <span id="navbar-username" class="text-light me-3" sec:authentication="name"></span>
+
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-outline-light">Logout</button>
+                    </form>
+                </div>
+
+                <div sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="btn btn-primary">Sign In</a>
+                </div>
+
+            </div>
         </div>
     </div>
 </nav>

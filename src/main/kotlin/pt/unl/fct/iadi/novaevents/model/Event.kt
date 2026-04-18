@@ -1,6 +1,7 @@
 package pt.unl.fct.iadi.novaevents.model
 
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -26,4 +27,8 @@ open class Event {
     var type: EventType? = null
 
     var description: String? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    var owner: User? = null
 }

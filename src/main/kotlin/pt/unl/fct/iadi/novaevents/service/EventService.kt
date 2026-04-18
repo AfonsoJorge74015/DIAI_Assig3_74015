@@ -1,16 +1,20 @@
 package pt.unl.fct.iadi.novaevents.service
 
 import jakarta.transaction.Transactional
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
 import pt.unl.fct.iadi.novaevents.model.Event
 import pt.unl.fct.iadi.novaevents.repository.EventRepository
 import pt.unl.fct.iadi.novaevents.repository.EventTypeRepository
+import pt.unl.fct.iadi.novaevents.repository.UserRepository
 
 @Service
 class EventService(
     private val eventRepository: EventRepository,
-    private val eventTypeRepository: EventTypeRepository
+    private val eventTypeRepository: EventTypeRepository,
+    private val userRepository: UserRepository
 ) {
 
     fun getFilteredEvents(type: String?, clubId: Long?): List<Event> {
@@ -35,6 +39,9 @@ class EventService(
 
     @Transactional
     fun createEvent(clubId: Long, form: EventFormRequest): Event {
+        val username = SecurityContextHolder.getContext().authentication.name
+        val currentUser = userRepository.findByUsername(username)
+            ?: throw IllegalStateException("User not found")
         val event = Event().apply {
             this.clubId = clubId
             this.name = form.name
@@ -42,11 +49,13 @@ class EventService(
             this.location = form.location
             this.type = eventTypeRepository.findByName(form.type!!)
             this.description = form.description
+            this.owner = currentUser
         }
 
         return eventRepository.save(event)
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     @Transactional
     fun updateEvent(eventId: Long, clubId: Long, form: EventFormRequest) {
         val event = eventRepository.findById(eventId)
@@ -62,6 +71,7 @@ class EventService(
         eventRepository.save(event)
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     fun deleteEvent(eventId: Long) {
         eventRepository.deleteById(eventId)
     }

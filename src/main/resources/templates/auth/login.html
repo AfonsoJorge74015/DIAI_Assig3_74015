@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Login')}"></head>
+<body>
+<nav th:replace="~{layout :: navbar}"></nav>
+
+<div class="container mt-5 max-w-sm mx-auto" style="max-width: 400px;">
+    <h2 class="mb-4 text-center">Nova Events Sign In</h2>
+
+    <div th:if="${param.error}" class="alert alert-danger">
+        Invalid username or password.
+    </div>
+
+    <form th:action="@{/login}" method="post" class="card p-4 shadow-sm">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" name="username" class="form-control" required autofocus>
+        </div>
+        <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Sign in</button>
+    </form>
+</div>
+
+<th:block th:replace="~{layout :: scripts}"></th:block>
+</body>
+</html>

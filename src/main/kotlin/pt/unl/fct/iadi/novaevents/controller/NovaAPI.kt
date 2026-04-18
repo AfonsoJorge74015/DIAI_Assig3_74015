@@ -60,4 +60,9 @@ interface NovaAPI {
 
     @DeleteMapping("/clubs/{clubId}/events/{eventId}")
     fun deleteEvent(@PathVariable clubId: Long, @PathVariable eventId: Long, model: ModelMap): String
+
+    @GetMapping("/login")
+    fun loginPage(): String {
+        return "auth/login"
+    }
 }

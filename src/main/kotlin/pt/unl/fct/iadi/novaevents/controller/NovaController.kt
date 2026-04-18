@@ -1,5 +1,6 @@
 package pt.unl.fct.iadi.novaevents.controller
 
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -73,6 +74,7 @@ class NovaController(
         return "redirect:/clubs/${clubId}/events/${newEvent.id}"
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     override fun editForm(clubId: Long, eventId: Long, model: ModelMap): String {
         val currentEvent = eventService.getEvent(eventId)
         val eventDto = mappers.toEventResponse(currentEvent)
@@ -91,6 +93,7 @@ class NovaController(
         return "events/editForm"
     }
 
+    @PreAuthorize("@eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     override fun submitFormEdit(
         clubId: Long,
         eventId: Long,
@@ -113,6 +116,7 @@ class NovaController(
         return "redirect:/clubs/${clubId}/events/${eventId}"
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     override fun deleteConfirm(clubId: Long, eventId: Long, model: ModelMap): String {
         val club = clubService.getClub(clubId)
         val event = eventService.getEvent(eventId)
@@ -121,6 +125,7 @@ class NovaController(
         return "events/delete"
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
     override fun deleteEvent(clubId: Long, eventId: Long, model: ModelMap): String {
         eventService.deleteEvent(eventId)
         return "redirect:/clubs/${clubId}"
