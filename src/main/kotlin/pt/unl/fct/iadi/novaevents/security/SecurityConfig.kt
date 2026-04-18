@@ -86,9 +86,9 @@ class SecurityConfig(
             val loginEntryPoint = LoginUrlAuthenticationEntryPoint("/login")
 
             exceptions.authenticationEntryPoint { request, response, authException ->
-                val requestUri = request.requestURI
+                val requestUrl = request.requestURL.toString()
                 val queryString = request.queryString
-                val targetUrl = if (queryString != null) "$requestUri?$queryString" else requestUri
+                val targetUrl = if (queryString != null) "$requestUrl?$queryString" else requestUrl
 
                 val redirectCookie = Cookie("REDIRECT_URI", targetUrl).apply {
                     path = "/"
