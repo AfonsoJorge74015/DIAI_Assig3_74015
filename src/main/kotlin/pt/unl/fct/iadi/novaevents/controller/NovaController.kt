@@ -65,11 +65,12 @@ class NovaController(
     override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
         val club = clubService.getClub(clubId)
 
-        if (club.name == "Hiking & Outdoors") {
-            if (event.location.isNullOrBlank()) {
+        if (club.name?.contains("Hiking", ignoreCase = true) == true) {
+            val location = event.location?.trim()
+            if (location.isNullOrEmpty()) {
                 bindingResult.rejectValue("location", "required", "Location is required for outdoor events")
             } else {
-                val isRaining = weatherService.isRaining(event.location!!)
+                val isRaining = weatherService.isRaining(location)
                 if (isRaining == true) {
                     bindingResult.rejectValue("location", "weather",
                         "It is currently raining at \"${event.location}\" — outdoor events cannot be created in bad weather")
@@ -80,14 +81,15 @@ class NovaController(
         if (event.name != null && eventService.getEventByName(event.name)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
+
         if(bindingResult.hasErrors()) {
-            val club = clubService.getClub(clubId)
             model["club"] = mappers.toClubResponse(club)
             model["eventTypes"] = eventTypeService.allEventTypes()
             return "events/form"
         }
+
         val newEvent = eventService.createEvent(clubId, event)
-        return "redirect:/clubs/${clubId}/events/${newEvent.id}"
+        return "redirect:/clubs/${clubId}/events/${newEvent.id}" // Returns 302 Redirect
     }
 
     @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
@@ -110,26 +112,35 @@ class NovaController(
     }
 
     @PreAuthorize("@eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
-    override fun submitFormEdit(
-        clubId: Long,
-        eventId: Long,
-        event: EventFormRequest,
-        bindingResult: BindingResult,
-        model: ModelMap
-    ): String {
+    override fun submitFormEdit(clubId: Long, eventId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
+        val club = clubService.getClub(clubId)
+
+        if (club.name?.contains("Hiking", ignoreCase = true) == true) {
+            val location = event.location?.trim()
+            if (location.isNullOrEmpty()) {
+                bindingResult.rejectValue("location", "required", "Location is required for outdoor events")
+            } else {
+                val isRaining = weatherService.isRaining(location)
+                if (isRaining == true) {
+                    bindingResult.rejectValue("location", "weather",
+                        "It is currently raining at \"${event.location}\" — outdoor events cannot be created in bad weather")
+                }
+            }
+        }
+
         if (eventService.getEventByNameExcludingId(event.name!!, eventId)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
+
         if(bindingResult.hasErrors()) {
-            val club = clubService.getClub(clubId)
-            val event = eventService.getEvent(eventId)
             model["club"] = mappers.toClubResponse(club)
-            model["event"] = mappers.toEventResponse(event)
+            model["event"] = mappers.toEventResponse(eventService.getEvent(eventId))
             model["eventTypes"] = eventTypeService.allEventTypes()
-            return "events/editForm"
+            return "events/editForm" // Returns 200 OK
         }
+
         eventService.updateEvent(eventId, clubId, event)
-        return "redirect:/clubs/${clubId}/events/${eventId}"
+        return "redirect:/clubs/${clubId}/events/${eventId}" // Returns 302 Redirect
     }
 
     @PreAuthorize("hasRole('ADMIN') or @eventRepository.findById(#eventId).orElse(null)?.owner?.username == authentication.name")
