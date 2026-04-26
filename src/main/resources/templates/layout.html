@@ -29,8 +29,7 @@
             <div class="d-flex">
 
                 <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
-                    <span id="navbar-username" class="text-light me-3" sec:authentication="name"></span>
-
+                    <span id="navbar-username" class="navbar-username text-light me-3 fw-bold" sec:authentication="name"></span>
                     <form th:action="@{/logout}" method="post" class="m-0">
                         <button type="submit" class="btn btn-outline-light">Logout</button>
                     </form>
