@@ -41,9 +41,51 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="location" class="form-label fw-bold">Location</label>
-                    <input type="text" id="location" th:field="*{location}" class="form-control" placeholder="Optional">
+                    <label for="location" class="form-label">Location</label>
+
+                    <div class="input-group">
+                        <input type="text" id="location" name="location" th:field="*{location}"
+                               class="form-control" th:classappend="${#fields.hasErrors('location')} ? 'is-invalid' : ''">
+
+                        <button type="button" class="btn btn-outline-secondary" onclick="checkWeatherJs()">
+                            Check Weather JS
+                        </button>
+
+                        <button type="button" class="btn btn-outline-secondary"
+                                hx-get="/api/weather"
+                                hx-include="#location"
+                                hx-target="#weather-result"
+                                hx-swap="innerHTML">
+                            Check Weather HTMX
+                        </button>
+                    </div>
+
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
+
+                    <div id="weather-result" class="mt-2"></div>
                 </div>
+
+                <script>
+                    function checkWeatherJs() {
+                        const loc = document.getElementById('location').value;
+                        if (!loc) return;
+
+                        fetch('/api/weather?location=' + encodeURIComponent(loc), {
+                            headers: { 'Accept': 'application/json' }
+                        })
+                            .then(r => r.json())
+                            .then(data => {
+                                const container = document.getElementById('weather-result');
+                                if (data.raining === true) {
+                                    container.innerHTML = '<span class="badge bg-warning text-dark">Raining</span>';
+                                } else if (data.raining === false) {
+                                    container.innerHTML = '<span class="badge bg-success">Clear</span>';
+                                } else {
+                                    container.innerHTML = '<span class="text-secondary">Weather data unavailable.</span>';
+                                }
+                            });
+                    }
+                </script>
 
                 <div class="mb-4">
                     <label for="description" class="form-label fw-bold">Description</label>

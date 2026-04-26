@@ -3,6 +3,7 @@ package pt.unl.fct.iadi.novaevents.security
 import jakarta.servlet.http.Cookie
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -27,7 +28,19 @@ class SecurityConfig(
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    @Order(1)
+    fun apiFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http.securityMatcher("/api/**")
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .csrf { it.disable() }
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+        return http.build()
+    }
+
+    @Bean
+    @Order(2)
+    fun webFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.csrf { it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) }
 

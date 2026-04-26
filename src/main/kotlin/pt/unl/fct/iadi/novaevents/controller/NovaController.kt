@@ -8,6 +8,7 @@ import pt.unl.fct.iadi.novaevents.controller.dto.EventFormRequest
 import pt.unl.fct.iadi.novaevents.service.ClubService
 import pt.unl.fct.iadi.novaevents.service.EventService
 import pt.unl.fct.iadi.novaevents.service.EventTypeService
+import pt.unl.fct.iadi.novaevents.service.WeatherService
 import pt.unl.fct.iadi.novaevents.utils.Mappers
 import kotlin.collections.set
 
@@ -16,6 +17,7 @@ class NovaController(
     private val clubService: ClubService,
     private val eventService: EventService,
     private val eventTypeService: EventTypeService,
+    private val weatherService: WeatherService,
     private val mappers: Mappers
 ) : NovaAPI {
 
@@ -61,6 +63,20 @@ class NovaController(
     }
 
     override fun submitFormNew(clubId: Long, event: EventFormRequest, bindingResult: BindingResult, model: ModelMap): String {
+        val club = clubService.getClub(clubId)
+
+        if (club.name == "Hiking & Outdoors") {
+            if (event.location.isNullOrBlank()) {
+                bindingResult.rejectValue("location", "required", "Location is required for outdoor events")
+            } else {
+                val isRaining = weatherService.isRaining(event.location!!)
+                if (isRaining == true) {
+                    bindingResult.rejectValue("location", "weather",
+                        "It is currently raining at \"${event.location}\" — outdoor events cannot be created in bad weather")
+                }
+            }
+        }
+
         if (event.name != null && eventService.getEventByName(event.name)) {
             bindingResult.rejectValue("name", "duplicate", "An event with this name already exists")
         }
